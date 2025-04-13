@@ -16,6 +16,14 @@ const isValidImageUrl = (url) => {
   }
 };
 
+// Helper function to get image dimensions
+const getImageDimensions = (url) => {
+  return {
+    width: 800,
+    height: 600,
+  };
+};
+
 export default function RecipeCollections() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [recipes, setRecipes] = useState([]);

@@ -12,6 +12,7 @@ const nextConfig = {
     unoptimized: true,
     domains: ['*'],
   },
+  output: 'standalone',
 }
 
 module.exports = nextConfig
