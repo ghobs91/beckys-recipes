@@ -5,6 +5,17 @@ import Image from 'next/image';
 
 const difficulties = ["Easy", "Medium", "Hard"];
 
+// Helper function to validate image URL
+const isValidImageUrl = (url) => {
+  if (!url) return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export default function RecipeCollections() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [recipes, setRecipes] = useState([]);
@@ -24,7 +35,8 @@ export default function RecipeCollections() {
       .then((data) => {
         const processedData = data.map(recipe => ({
           ...recipe,
-          difficulty: recipe.difficulty || "Medium"
+          difficulty: recipe.difficulty || "Medium",
+          image: isValidImageUrl(recipe.image) ? recipe.image : null
         }));
         setRecipes(processedData);
         setLoading(false);
@@ -106,25 +118,26 @@ export default function RecipeCollections() {
                 onClick={() => setSelectedRecipe(recipe)}
               >
                 <div className="relative h-48 w-full">
-                  {recipe.image ? (
-                    <Image
-                      src={recipe.image}
-                      alt={recipe.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      priority={idx < 6}
-                      unoptimized={true}
-                      onError={(e) => {
-                        // Handle image load error by replacing with a placeholder
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.parentElement.innerHTML = `
-                          <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-500">No image available</span>
-                          </div>
-                        `;
-                      }}
-                    />
+                  {recipe.image && isValidImageUrl(recipe.image) ? (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={recipe.image}
+                        alt={recipe.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={idx < 6}
+                        unoptimized={true}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement.innerHTML = `
+                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                              <span class="text-gray-500">No image available</span>
+                            </div>
+                          `;
+                        }}
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                       <span className="text-gray-500">No image available</span>
@@ -156,26 +169,31 @@ export default function RecipeCollections() {
               </button>
             </div>
             <div className="p-6">
-              {selectedRecipe.image && (
+              {selectedRecipe.image && isValidImageUrl(selectedRecipe.image) ? (
                 <div className="relative h-64 w-full mb-6">
-                  <Image
-                    src={selectedRecipe.image}
-                    alt={selectedRecipe.title}
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority
-                    unoptimized={true}
-                    onError={(e) => {
-                      // Handle image load error by replacing with a placeholder
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement.innerHTML = `
-                        <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
-                          <span class="text-gray-500">No image available</span>
-                        </div>
-                      `;
-                    }}
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={selectedRecipe.image}
+                      alt={selectedRecipe.title}
+                      fill
+                      className="object-cover rounded-lg"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority
+                      unoptimized={true}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.parentElement.innerHTML = `
+                          <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+                            <span class="text-gray-500">No image available</span>
+                          </div>
+                        `;
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg mb-6">
+                  <span className="text-gray-500">No image available</span>
                 </div>
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

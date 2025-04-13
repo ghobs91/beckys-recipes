@@ -10,6 +10,10 @@ const nextConfig = {
       },
     ],
     unoptimized: true,
+    domains: ['*'],
+  },
+  experimental: {
+    optimizeCss: true,
   },
 }
 
