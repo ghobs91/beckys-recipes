@@ -115,6 +115,15 @@ export default function RecipeCollections() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       priority={idx < 6}
                       unoptimized={true}
+                      onError={(e) => {
+                        // Handle image load error by replacing with a placeholder
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.parentElement.innerHTML = `
+                          <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-500">No image available</span>
+                          </div>
+                        `;
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -157,6 +166,15 @@ export default function RecipeCollections() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     priority
                     unoptimized={true}
+                    onError={(e) => {
+                      // Handle image load error by replacing with a placeholder
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement.innerHTML = `
+                        <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+                          <span class="text-gray-500">No image available</span>
+                        </div>
+                      `;
+                    }}
                   />
                 </div>
               )}
