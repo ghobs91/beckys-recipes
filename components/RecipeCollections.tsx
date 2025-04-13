@@ -6,7 +6,7 @@ import Image from 'next/image';
 const difficulties = ["Easy", "Medium", "Hard"];
 
 export default function RecipeCollections() {
-  const [expanded, setExpanded] = useState(null);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [recipes, setRecipes] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -22,10 +22,9 @@ export default function RecipeCollections() {
         return res.json();
       })
       .then((data) => {
-        // Add default difficulty if missing
         const processedData = data.map(recipe => ({
           ...recipe,
-          difficulty: recipe.difficulty || "Medium" // Default to Medium if difficulty is missing
+          difficulty: recipe.difficulty || "Medium"
         }));
         setRecipes(processedData);
         setLoading(false);
@@ -39,7 +38,9 @@ export default function RecipeCollections() {
   const filteredRecipes = recipes.filter(
     (recipe) =>
       recipe.title.toLowerCase().includes(search.toLowerCase()) ||
-      (recipe.content && recipe.content.toLowerCase().includes(search.toLowerCase()))
+      (recipe.ingredients && recipe.ingredients.some(ingredient => 
+        ingredient.toLowerCase().includes(search.toLowerCase())
+      ))
   );
 
   // Don't render anything until after hydration to avoid mismatch
@@ -102,7 +103,7 @@ export default function RecipeCollections() {
               <div
                 key={idx}
                 className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-                onClick={() => setExpanded(expanded === idx ? null : idx)}
+                onClick={() => setSelectedRecipe(recipe)}
               >
                 <div className="relative h-48 w-full">
                   {recipe.image ? (
@@ -123,15 +124,69 @@ export default function RecipeCollections() {
                 </div>
                 <div className="p-4">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{recipe.title}</h3>
-                  {expanded === idx && (
-                    <pre className="whitespace-pre-wrap text-sm text-gray-700 mt-2 bg-gray-50 p-3 rounded">{recipe.content}</pre>
-                  )}
                 </div>
               </div>
             ))}
           </div>
         </div>
       ))}
+
+      {/* Recipe Modal */}
+      {selectedRecipe && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedRecipe.title}</h2>
+              <button
+                onClick={() => setSelectedRecipe(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              {selectedRecipe.image && (
+                <div className="relative h-64 w-full mb-6">
+                  <Image
+                    src={selectedRecipe.image}
+                    alt={selectedRecipe.title}
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                    unoptimized={true}
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Ingredients</h3>
+                  <ul className="list-disc pl-5 space-y-2">
+                    {selectedRecipe.ingredients && selectedRecipe.ingredients.map((ingredient, i) => (
+                      <li key={i} className="text-gray-700">{ingredient}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Instructions</h3>
+                  <ol className="list-decimal pl-5 space-y-3">
+                    {selectedRecipe.instructions && selectedRecipe.instructions.map((instruction, i) => (
+                      <li key={i} className="text-gray-700">{instruction}</li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+              {selectedRecipe.total_time && (
+                <div className="mt-6 text-sm text-gray-600">
+                  Total Time: {selectedRecipe.total_time} minutes
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

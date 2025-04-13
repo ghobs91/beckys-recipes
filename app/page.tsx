@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-6 text-center">Recipe Collections</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Becky's Meal Prep Collection</h1>
         {mounted ? <RecipeCollections /> : (
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
