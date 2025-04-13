@@ -106,11 +106,27 @@ const urls = [
         const title = document.querySelector('h1')?.innerText || '';
         const ingredients = getTextList('[class*=ingredient], [id*=ingredient]');
         const instructions = getTextList('[class*=instruction], [id*=instruction], ol li');
+        
+        // Extract image from meta tags or main image
+        let image = '';
+        
+        // Try to get image from meta tags first
+        const ogImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content');
+        if (ogImage) {
+          image = ogImage;
+        } else {
+          // Try to get the first large image on the page
+          const mainImage = document.querySelector('img[src*="recipe"], img[src*="food"], img[src*="dish"], img[src*="meal"]');
+          if (mainImage) {
+            image = mainImage.src;
+          }
+        }
 
         return {
           title,
           ingredients,
-          instructions
+          instructions,
+          image
         };
       });
 
